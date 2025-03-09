@@ -1,0 +1,28 @@
+\begin{table}[htbp]
+\centering
+\caption{网络环境中的重要任务关键性能指标及经典控制策略}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{@{}ccccc@{}}
+\toprule
+\textbf{任务}                                          & \textbf{关键性能指标}                                & \textbf{策略} & \textbf{原理} & \textbf{年份} \\ \midrule
+\multirow{6}{*}{\textbf{自适应码率流媒体}} & \multirow{6}{*}{重缓冲、码率、平滑性} & Pensieve \cite{mao2017neural}          & 基于强化学习            & 2017          \\
+                                                       &                                              & Genet \cite{xia2022genet}            & 基于强化学习            & 2022          \\
+                                                       &                                              & MPC               & 动态规划                  & 2015          \\
+                                                       &                                              & BBA               & 基于缓冲区        & 2014          \\
+                                                       &                                              & BOLA \cite{spiteri2020bola}             & 基于缓冲区        & 2016          \\
+                                                       &                                              & NetLLM \cite{wu2024netllm}            & 基于Transformer   & 2024          \\ \midrule
+\multirow{6}{*}{\textbf{拥塞控制}}           & \multirow{6}{*}{吞吐量、丢包、延迟}    & CUBIC \cite{ha2008cubic}             & 基于丢包          & 1990年代         \\
+                                                       &                                              & Reno              & 基于丢包          & 1990年代         \\
+                                                       &                                              & WestWood \cite{casetti2002tcp}          & 基于丢包          & 2002          \\
+                                                       &                                              & BBR \cite{cardwell2016bbr}
+                                                    & 带宽延迟积                 & 2015          \\
+                                                       &                                              & Aurora \cite{jay2019deep}            & 基于强化学习            & 2019          \\
+                                                       &                                              & Sage \cite{yen2023computers}             & 基于强化学习            & 2023          \\ \midrule
+
+\multirow{2}{*}{\textbf{梯度压缩}}         & \multirow{2}{*}{压缩率、准确度、效率}                            & Top-K             & 稀疏化           & 2010年代        \\
+                                                    
+                                                       &                                              & DC2 \cite{abdelmoniem2021dc2}             & 基于延迟    &   2021            \\ \bottomrule
+\end{tabular}
+}
+\label{table_task_algo}
+\end{table}

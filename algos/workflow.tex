@@ -1,0 +1,33 @@
+
+
+\begin{algorithm}
+\caption{规划与网络任务控制流程}
+\label{algo_proc}
+\begin{algorithmic}[1]
+% \STATE \textbf{输入:} 网络变化趋势嵌入接口, 预训练模型权重
+% \STATE \textbf{输出:} 网络规划结果, 网络状态统计信息
+
+\STATE \textbf{规划流程}:
+\STATE 配置网络分析嵌入接口
+\STATE 加载模型权重
+
+\WHILE{接收到状态回报}
+    \STATE 网络规划
+    \STATE 发送网络规划结果
+\ENDWHILE
+
+\STATE \textbf{网络任务控制流程}:
+\STATE 执行网络任务
+
+\WHILE{固定粒度的时刻到达}
+    \STATE 采集网络状态信息
+    \STATE 发送网络状态统计信息
+\ENDWHILE
+
+\STATE \textbf{异步线程执行}:
+\WHILE{收到发送结果}
+    \STATE 根据规划结果开始切换算法
+\ENDWHILE
+
+\end{algorithmic}
+\end{algorithm}

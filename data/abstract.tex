@@ -1,0 +1,34 @@
+% !TeX root = ../thuthesis-example.tex
+
+% 中英文摘要和关键字
+
+\begin{abstract}
+随着多媒体网络应用的快速发展，网络传输速率控制策略在提升用户体验方面起着至关重要的作用。然而，现有的传输速率控制策略面临着两大挑战：一方面，网络应用场景的多样性和用户需求的异质性导致了不同应用在网络传输中的需求差异；另一方面，现有的控制策略库由于设计准则的差异，在单一策略工作时无法灵活应对不同场景和网络环境的适配性要求。因此，本研究旨在利用强化学习的决策框架，在异质网络场景下展开传输策略的优化。本文的研究内容包括两个主要方面：
+
+（1）在云游戏场景下，设计对差异化的时延敏感度可感知的传输速率控制算法。算法提出了“时延敏感度”概念，并通过展开大规模客观数据测量确定不同的场景下内容对于敏感度的影响，确定了三类不同敏感度分类，并在每类敏感度下展开用户MOS实验确定了敏感度的量化数值，将其使用最小二乘法转换为强化学习的奖励空间部份构成。随后使用强化学习中演员-评论家方法优化不同场景下的传输速率，以实现延迟和视觉质量之间的最优平衡解，提升用户体验质量（Quality of Experience，QoE）。
+
+（2）对于已具备策略库的多种网络任务类型，提出一种新规划范式设计。研究通过对现有通用网络控制方案展开流程重构，利用预训练语言模型（Pretrained Language Model，PLM）的决策和感知能力，结合Decision Transformer强化学习框架，实现策略的动态切换和适配网络的最佳选择，提升传输速率控制的适应性和效率。最后，该范式设计的被部署在自适应码率任务仿真系统上作为案例进行分析和评估。
+
+本研究提出的算法和控制范式能够有效提高了云游戏等实时通信应用中的用户体验质量，并为未来在更多复杂网络环境中的应用提供了理论支持和实践方案。
+
+
+  % 关键词用“英文逗号”分隔，输出时会自动处理为正确的分隔符
+  \thusetup{
+    keywords = {网络传输速率控制；云游戏；强化学习；预训练大模型；用户体验质量},
+  }
+\end{abstract}
+
+\begin{abstract*}
+  With the rapid development of multimedia network applications, network transmission rate control strategies play a crucial role in enhancing user experience. However, existing transmission rate control strategies face two major challenges: on the one hand, the diversity of network application scenarios and the heterogeneity of user demands lead to varying requirements for network transmission across different applications; on the other hand, due to differences in design principles, existing control strategy libraries struggle to flexibly adapt to different scenarios and network environments when operating under a single strategy. Therefore, this study aims to optimize transmission strategies in heterogeneous network scenarios using the decision-making framework of reinforcement learning. The research focuses on two main aspects:
+
+(1) In the cloud gaming scenario, a transmission rate control algorithm capable of perceiving differentiated latency sensitivity is designed. The algorithm introduces the concept of "latency sensitivity" and determines the impact of different scenarios on sensitivity through large-scale objective data measurements. Three different sensitivity classifications are established, and for each sensitivity category, user MOS (Mean Opinion Score) experiments are conducted to quantify the sensitivity values. These values are then converted into the reward space of reinforcement learning using the least squares method. Subsequently, the actor-critic method in reinforcement learning is employed to optimize transmission rates across different scenarios, achieving an optimal balance between latency and visual quality, thereby enhancing the Quality of Experience (QoE).
+
+(2) For various network task types that already possess a strategy library, a novel planning paradigm is proposed. This study reconstructs the workflow of existing general network control schemes and leverages the decision-making and perception capabilities of Pretrained Language Models (PLM), combined with the Decision Transformer reinforcement learning framework, to achieve dynamic strategy switching and optimal adaptation to the network environment, thereby improving the adaptability and efficiency of transmission rate control. Finally, this paradigm design is deployed in an adaptive bitrate task simulation system as a case study for analysis and evaluation.
+
+The proposed algorithm and control paradigm in this study effectively enhance the QoE in real-time communication applications such as cloud gaming and provide theoretical support and practical solutions for future applications in more complex network environments.
+
+  % Use comma as separator when inputting
+  \thusetup{
+    keywords* = {Network Transmission Rate Control, Cloud Gaming, Reinforcement Learning, Large Language Model, Quality User Experience},
+  }
+\end{abstract*}
