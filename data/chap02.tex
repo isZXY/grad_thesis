@@ -25,14 +25,14 @@
 还有一部分工作着重研究了画质和码率切换对于用户体验带来的负面影响的具体衡量方法。\cite{slivar2016cloud,jamshidi2022deep,utke2022ndnetgaming}中通过将画面灰度的峰值信噪比（Peak Signal-to-noise ratio，PSNR）或视频多方法评估融合（Video Multimethod Assessment Fusion， VMAF）指标值区间映射入各自的长短时记忆模型（Long Short-Term Memory，LSTM），获得以秒为粒度的预测用户质量数据。
 \cite{mao2017neural,huang2019comyco,nathan2019end}在对于各自的模型进行评估时使用式\eqref{equation-qoe}进行QoE中品质降级的过渡策略（画面跳过、画面预测、自适应比特率或重新加载）带来的影响的量化衡量：
 \begin{equation}
-    QoE = \sum_{n=1}^{N}q(R_n) - \mu \sum_{n=1}^{N}q(T_n) - \sum_{n=1}^{N-1}\lvert q(R_{n+1})-q(R_n) \rvert
+    QoE = \sum_{n=1}^{N}q(R_n) - \mu \sum_{n=1}^{N}q(T_n) - \sum_{n=1}^{N-1}\lvert q(R_{n+1})-q(R_n) \rvert,
 \label{equation-qoe}
 \end{equation}
 
 其中， $N$ 代表视频块的数量，$R_n$ 代表第 $n$ 个视频块的比特率，$T_n$ 代表第 $n$ 个视频块重加载的时间，最后一项代表比特率切换的影响，亦被称作为流畅度。 $\mu$ 则是经验值罚项。
 
 
-\subsection{特定应用需求差异性揭露工作}
+\subsection{特定应用需求差异性分析工作}
 E2E\cite{zhang2019e2e}对互联网上流量吞吐提出了大型范式，涵盖了所有涉及用户参与的连接请求，其核心思想在在于挖掘用户对于应用需求的QoE异质性。对于云游戏、视频会议、360$^{\circ}$视频等不同种类的应用，现有的工作对它们展开了针对性的探索。ClayPool等人尝试描述网络游戏中玩家对于其操作响应和画面变化延迟的敏感性\cite{claypool2006latency,claypool2010latency}，使用网络时延对于用户表现分数的影响说明了游戏内容对时延要求差异的存在和定性，并给出了要求的极端下限阈值。EyeQoE\cite{zhu2022eyeqoe}在VR设备的使用过程中和360$^{\circ}$视频的播放对用户的眼球运动进行追踪，对具体的眼球运动分类并捕捉运动模式，以预测其运动轨迹和感知质量。Michael等人尝试开展对于用户的主观测试\cite{jarschel2011evaluation}，并发掘了游戏节奏是有差异性的，这种差异性造成了对网络时延控制、丢包控制等优先性的偏好不同。Cheng等人在大型短视频服务提供商的数据集上进行了广泛的用户行为研究\cite{cheng2023rebuffering}。测量数据表明，不同的视频流内容虽然在遇到卡顿时会让用户不满，进而增加用户的提前退出率，但是它们的概率是有所不同的，体现出不同视频流卡顿对QoE影响的差异性。
 
 
@@ -56,7 +56,7 @@ E2E\cite{zhang2019e2e}对互联网上流量吞吐提出了大型范式，涵盖�
 
 BIC-TCP\cite{xu2004binary}和Cubic\cite{ha2008cubic}是另外两个相似的基于网络丢包的速率控制，使用窗口增长函数完成窗口的估测，Cubic使用一个奇数阶多项式修正窗口增长函数，增加了窗口增长的稳定性，避免过激带来丢包。Cubic也是目前Linux内核中默认采用的拥塞控制算法。相比于Reno，Cubic类的算法能够更快地恢复拥塞窗口。上述的Reno、Cubic都是基于一个固定规则的方法，具有极佳的稳定性。
 
-基于测量时延（delay-based）的拥塞控制主要基于探测包发送到到达的时间或其计算后的元素。通常来说，从发送端向接收端的发送路径和从接收端向发送端的发送路径应被视作两条异质化的、无相关性的链路，这是因为它们经过的路由可能不同，或即时相同网络状况也有所差异，网络带宽有所不同。但是，由于测量手法限制，实际测量时会根据往返时延（Round-Trip Time，RTT）的一半作为时延的估测使用，判断网络的状况。还有部分算法会使用往返时延对单位时间$T$的微分（$\frac{dRTT}{dT}$），即包到达时间间隔的差异作为衡量标准。TCP Vegas\cite{brakmo1994tcp}使用连接中数据包的RTT决定发送速率和探测带宽。Google于2015年提出的BBR\cite{cardwell2016bbr}亦使用了这样的思想。作者认为，由于缓存技术的发展，网络这一本该即用即走的链路因为路由设备和中继设备的缓存装置使之有了存储的功能。由于网络设备处理能力有限，在应用发送包不断增加时，首先到达处理能力瓶颈。此时发送出的包容量为一个时延带宽积（BDP）。此时如果发送速率继续上升，会在网络存在的缓冲区中存储。此时会导致发送包处理的队列，造成ACK回复的时间变长，此时体现为测量到的往返时延（RTT）增加；直至网络缓冲区也被填满，此时就会产生丢包。BBR使用固定的时段探测带宽，并根据结果对于发送速率进行乘以固定因子的挑战，不断自适应网络状况。这一类方法也使用了一些固定的规则，带来可靠的同时适用于需要较低时延，但不存在较多竞争的任务。
+基于测量时延（delay-based）的拥塞控制主要基于探测包发送到到达的时间或其计算后的元素。通常来说，从发送端向接收端的发送路径和从接收端向发送端的发送路径应被视作两条异质化的、无相关性的链路，这是因为它们经过的路由可能不同，或即使相同网络状况也有所差异，网络带宽有所不同。但是，由于测量手法限制，实际测量时会根据往返时延（Round-Trip Time，RTT）的一半作为时延的估测使用，判断网络的状况。还有部分算法会使用往返时延对单位时间$T$的微分（$\frac{dRTT}{dT}$），即包到达时间间隔的差异作为衡量标准。TCP Vegas\cite{brakmo1994tcp}使用连接中数据包的RTT决定发送速率和探测带宽。Google于2015年提出的BBR\cite{cardwell2016bbr}亦使用了这样的思想。作者认为，由于缓存技术的发展，网络这一本该即用即走的链路因为路由设备和中继设备的缓存装置使之有了存储的功能。由于网络设备处理能力有限，在应用发送包不断增加时，首先到达处理能力瓶颈。此时发送出的包容量为一个时延带宽积（BDP）。此时如果发送速率继续上升，会在网络存在的缓冲区中存储。此时会导致发送包处理的队列，造成ACK回复的时间变长，此时体现为测量到的往返时延（RTT）增加；直至网络缓冲区也被填满，此时就会产生丢包。BBR使用固定的时段探测带宽，并根据结果对于发送速率进行乘以固定因子的挑战，不断自适应网络状况。这一类方法也使用了一些固定的规则，带来可靠的同时适用于需要较低时延，但不存在较多竞争的任务。
 
 而Copa\cite{arun2018copa}是一种默认工作在以传输时延作为探测信号的发送速率控制方法，保证低时延应用的传输；然而，在探测到其他丢包流竞争的时候，Copa会切换到以丢包为探测信号的工作模式中，以便在多流竞争中取得相对的公平性。这是由于当基于丢包控制算法与基于时延为信号的控制算法在一个瓶颈带宽时，时延瓶颈通常会先于丢包发生，造成算法竞争的不公平。Venkat Arun等人在工作\cite{arun2022starvation}中揭露了当前所有基于测量时延的拥塞控制算法中存在的多流竞争导致的部分算法的饥饿的现象，通过一个网络模型复现了多个前述算法在竞争中存在的缺陷，并给出了饥饿产生和拥塞算法收敛的推导，揭示了问题的本质。Copa对于网络的拥塞控制服务基于的原理是排队论中的 M/M/1 模型，建立在将包到达时间视为泊松过程（Poisson process）这一假设上对于发送速率进行优化，进而使网络利用率最高。这种算法能够兼顾低时延与公平性，适用于多流竞争情况下的低时延保障场景与任务。类似地，WebRTC中采用的GCC\cite{carlucci2016analysis}使用了混合丢包与时延策略的算法同时借助两种信息进行判断。延迟间隔经过多个滤波器后得到一个发送速率，同时丢包探测器同步进行丢包检测，同样给出一个发送速率，选择两者较小者实行。
 
@@ -93,7 +93,7 @@ Pensieve\cite{mao2017neural}是使用强化学习完成自适应码率任务的�
 
 
 
-\subsection{差异性和对比与范式工作}
+\subsection{差异性对比与工作范式研究}
 在速率控制算法的发展基础上，一个庞大的历史可用库得以累积。为了统计、分析这些速率控制方法的性能以及站在更大的角度审视它们，性能对比的工作和范式规划的工作被提出。
 
 近年来预训练大模型的出现为这一类任务提供了新的思路。得益于大模型强大的推理和决策能力，NetLLM\cite{wu2024netllm}提出了“一个模型适用所有网络任务”，亦包括了自适应码率的任务。为了适配码率的时序数据，NetLLM使用了一个多模态编码器，将网络状态时序信息编码进大模型的嵌入层；经过大模型的前向传播后限定输出头以准确地选择最终的码率。由于大模型丰富的经验和知识，NetLLM在实验中取得了优异的表现，为速率控制任务提供了崭新的思路。同样使用预训练大模型的还有LLM-ABR\cite{he2024llm}，但采取了不同的思路。LLM-ABR选择让大模型生成出可用的ABR策略，并通过一系列检测和性能测试后使用，进而构建了一个策略创建范式。Nada\cite{he2024designing} 在LLM-ABR基础上进一步改进，扩展到更多网络任务上。
@@ -105,14 +105,14 @@ Pensieve\cite{mao2017neural}是使用强化学习完成自适应码率任务的�
 
 适配用户需求异质性和网络环境差异性的网络范式也在强化学习蓬勃发展后涌现。E2E \cite{zhang2019e2e}是第一个能够充分利用用户异质性来优化服务器资源分配的系统范式，包括各类发送速率控制算法和场景。E2E系统通过考虑不同用户对服务器端延迟的敏感性来调整资源分配，从而优化整体的QoE。Sage\cite{yen2023computers} 则将过去几十年来的所有拥塞算法的工作模式和行为通过强化学习的方式迁移到它自身身上，构建了拥有所有拥塞控制特性的一个强大的拥塞控制算法。
 
-\section{强化学习}
-\subsection{强化学习的基础概念和定义}
+\section{强化学习领域框架概述}
+\subsection{强化学习的基本概念和定义}
 强化学习（Reinforcement learning，RL）是一种人工智能范式，涉及智能体（Agent）与环境（Environment）之间的交互，目的是最大化奖励函数 \cite{mnih2015human}。智能体与环境之间持续交互，在此框架下逐步学习，最终习得最优决策策略。
 
 在强化学习中，所有环境中可能观察到的结果形成状态空间 $\mathcal{S}$，它描述了智能体在任一时间点可能观察到的环境状态信息。智能体维护一个策略 $\pi$，该策略定义了智能体在给定状态下采取不同动作的概率分布。智能体根据环境当前状态 $s_t$ 在每个离散时间步 $t$ 决定采取一个动作 $a_t$。所有可以执行的动作构成动作空间 $\mathcal{A}$。一旦环境接收到智能体的动作 $a_t$，它会生成一个奖励信号 $r_t$ 并转移到新的状态 $s_{t+1}$。这个过程不断重复，最终学习到一个策略 $\pi(\mathcal{A}|\mathcal{S})$，该策略最大化奖励的折现总和，这个折现总和用回报 $R_t$ 表示，如式\eqref{eq:rl-reward}所示：
 \begin{equation}
 \begin{aligned}
-    R_t = \sum_{i=t}^{T}\gamma^{i-t}r(s_i,a_i) = r_t + \gamma r_{t+1} + ... + \gamma^{T-t}r_T
+    R_t = \sum_{i=t}^{T}\gamma^{i-t}r(s_i,a_i) = r_t + \gamma r_{t+1} + ... + \gamma^{T-t}r_T,
 \end{aligned}
 \label{eq:rl-reward}
 \end{equation}
@@ -121,16 +121,16 @@ Pensieve\cite{mao2017neural}是使用强化学习完成自适应码率任务的�
 强化学习通过学习找到一个最优策略 $\pi_\phi$，其参数为 $\phi$，该策略最大化期望回报。具体来说，强化学习的目标是通过调整策略的参数 $\phi$，使得期望回报（即长期奖励的总和）达到最大。这个过程通常通过优化式\eqref{eq:rl-Jtheta}所示的目标函数来实现：
 \begin{equation}
 \begin{aligned}
-    J(\phi) = \mathbb{E}_{s_i \sim p_\pi, a_i \sim \pi}[R_0]
+    J(\phi) = \mathbb{E}_{s_i \sim p_\pi, a_i \sim \pi}[R_0].
 \end{aligned}
 \label{eq:rl-Jtheta}
 \end{equation} 
 
-\subsection{强化学习演员-评论家架构}
+\subsection{强化学习Actor-Critic架构}
 在演员-评论家（Actor-Critic）架构中，包含两个网络：演员网络（Actor）和评论家网络（Critic）。演员网络学习最优的策略函数 $\pi_\phi(\mathcal{A}|\mathcal{S})$，旨在学习一个能够生成高奖励并与环境互动的策略。演员使用深度确定性策略梯度（Deep Deterministic Policy Gradient，DDPG）算法 \cite{silver2014deterministic} 来更新策略梯度。具体地，DDPG 是一种适用于连续动作空间的强化学习算法，通过策略梯度更新算法来改进策略，如式\eqref{eq:rl-nablaphi}所示：
 \begin{equation}
 \begin{aligned}
-    \nabla_\phi J(\phi)=\mathbb{E}_{s\sim p_\pi}\left[\nabla_aQ^{\pi}(s,a)|_{a=\pi(s)}\nabla_\phi\pi_\phi(s)\right]
+    \nabla_\phi J(\phi)=\mathbb{E}_{s\sim p_\pi}\left[\nabla_aQ^{\pi}(s,a)|_{a=\pi(s)}\nabla_\phi\pi_\phi(s)\right].
 \end{aligned}
 \label{eq:rl-nablaphi}
 \end{equation} 
@@ -138,7 +138,7 @@ Pensieve\cite{mao2017neural}是使用强化学习完成自适应码率任务的�
 评论家网络（Critic network）估计当前策略的价值函数，评估演员（Actor）网络的性能。评论家网络通过式\eqref{eq:rl-qpitheta}表示：
 \begin{equation}
 \begin{aligned}
-   Q^\pi(s,a)~=~\mathbb{E}_{s_i\sim p_\pi,a_i\sim\pi}\left[R_t|s,a\right]
+   Q^\pi(s,a)~=~\mathbb{E}_{s_i\sim p_\pi,a_i\sim\pi}\left[R_t|s,a\right].
 \end{aligned}
 \label{eq:rl-qpitheta}
 \end{equation} 
@@ -168,7 +168,7 @@ Decision Transformer相较于传统强化学习使用值函数（Q-Learning）�
 设定一个强化学习的序列状态 $s_t$、动作 $a_t$ 和奖励 $r_t$，其中$t$代表序列的决策时刻$1,2,...,T$，Decision Transformer利用该序列构建式\eqref{eq:three_deci}表示的三元组：
 \begin{equation}
 \begin{aligned}
-    (R_1,s_1,a_1,R_2,s_2,a_2,...,R_T,s_T,a_T)
+    (R_1,s_1,a_1,R_2,s_2,a_2,...,R_T,s_T,a_T),
 \end{aligned}
 \label{eq:three_deci}
 \end{equation} 
@@ -176,7 +176,7 @@ Decision Transformer相较于传统强化学习使用值函数（Q-Learning）�
 其中$R_t$代表Return-to-go，是Decision Transformer中特别的回报计算方式，统计从时间步$t$到终止时刻$T$的累计回报，用于告知模型优化的方向，如式\eqref{eq:rtg}所示：
 \begin{equation}
 \begin{aligned}
-    R_t = r_t + \gamma r_{t+1} + \gamma^2 r_{t+2} + ... + \gamma ^{T-t}r_{T}
+    R_t = r_t + \gamma r_{t+1} + \gamma^2 r_{t+2} + ... + \gamma ^{T-t}r_{T}.
 \end{aligned}
 \label{eq:rtg}
 \end{equation} 
@@ -186,17 +186,16 @@ Decision Transformer相较于传统强化学习使用值函数（Q-Learning）�
 Decision Transformer模型的预测是自回归的，给定过去的信息和目标回报，来预测当前的最优动作$\hat{a}_t$，可表示为式\eqref{eq:deci_at_goal}：
 \begin{equation}
 \begin{aligned}
-    \hat{a}_t = f(R_t,s_t|R_{t-1},s_{t-1},a_{t-1},...)
+    \hat{a}_t = f(R_t,s_t|R_{t-1},s_{t-1},a_{t-1},...).
 \end{aligned}
 \label{eq:deci_at_goal}
 \end{equation} 
 
 
-Decision Transformer训练时需要习得一个能够根据历史轨迹生成最优动作的策略，不通过实时与环境交互的方式，而是采用了有标签的监督学习方式进行训练，因此该方案更适配离线强化学习。其训练目标，即最小化的损失函数可以表示为式\eqref{eq:deci_trans_goal}
-\eqref{eq:deci_at_goal}：
+Decision Transformer训练时需要习得一个能够根据历史轨迹生成最优动作的策略，不通过实时与环境交互的方式，而是采用了有标签的监督学习方式进行训练，因此该方案更适配离线强化学习。其训练目标，即最小化的损失函数可以表示为式\eqref{eq:deci_trans_goal}：
 \begin{equation}
 \begin{aligned}
-    L(\phi) = \mathbb{E}_{(R_t,s_t,a_t) \sim \mathcal{D}}\left[||a_t-\hat{a}_t||^2\right]
+    L(\phi) = \mathbb{E}_{(R_t,s_t,a_t) \sim \mathcal{D}}\left[||a_t-\hat{a}_t||^2\right],
 \end{aligned}
 \label{eq:deci_trans_goal}
 \end{equation}
